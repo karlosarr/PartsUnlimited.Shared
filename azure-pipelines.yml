@@ -15,7 +15,12 @@ variables:
   buildConfiguration: 'Release'
 
 steps:
-- task: NuGetToolInstaller@1
+- task: NuGetCommand@2
+  inputs:
+    command: 'restore'
+    restoreSolution: '**/*.sln'
+    feedsToUse: 'select'
+    vstsFeed: 'b91a787c-8f4a-41f0-b6fa-7828a4cd4706/9813e6f5-b7fd-4d1f-ad57-c0dfe485504d'
 
 - task: NuGetCommand@2
   inputs:
@@ -31,3 +36,16 @@ steps:
   inputs:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
+
+- task: NuGetCommand@2
+  inputs:
+    command: 'pack'
+    packagesToPack: '**/*.csproj'
+    versioningScheme: 'off'
+
+- task: NuGetCommand@2
+  inputs:
+    command: 'push'
+    packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg'
+    nuGetFeedType: 'internal'
+    publishVstsFeed: 'b91a787c-8f4a-41f0-b6fa-7828a4cd4706/9813e6f5-b7fd-4d1f-ad57-c0dfe485504d'
